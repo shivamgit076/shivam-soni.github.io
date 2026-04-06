@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,334 +19,640 @@
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-    .animate-pulse { animation: pulse 2s infinite; }
-    html { scroll-behavior: smooth; }
-    ::selection { background:#ddd6fe; color:#4c1d95; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(22px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .4
+      }
+    }
+
+    .animate-pulse {
+      animation: pulse 2s infinite;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    ::selection {
+      background: #ddd6fe;
+      color: #4c1d95;
+    }
+
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+    @keyframes orbit { from{transform:rotate(0deg) translateX(60px) rotate(0deg)} to{transform:rotate(360deg) translateX(60px) rotate(-360deg)} }
+    @keyframes pulseGlow { 0%,100%{opacity:.3;filter:blur(2px)} 50%{opacity:.8;filter:blur(4px)} }
+    @keyframes dataFlow { 0%{stroke-dashoffset:200} 100%{stroke-dashoffset:0} }
+    @keyframes typing { from{width:0} to{width:100%} }
+    @keyframes blink { 0%,50%{border-color:#7c3aed} 51%,100%{border-color:transparent} }
+    @keyframes nodeFloat1 { 0%,100%{transform:translate(0,0)} 25%{transform:translate(8px,-15px)} 50%{transform:translate(-5px,-8px)} 75%{transform:translate(12px,5px)} }
+    @keyframes nodeFloat2 { 0%,100%{transform:translate(0,0)} 25%{transform:translate(-10px,8px)} 50%{transform:translate(6px,15px)} 75%{transform:translate(-8px,-5px)} }
+    @keyframes nodeFloat3 { 0%,100%{transform:translate(0,0)} 33%{transform:translate(15px,10px)} 66%{transform:translate(-12px,-8px)} }
+    @keyframes scanLine { 0%{top:-2px} 100%{top:100%} }
+    @keyframes termTypeLine { from{width:0} to{width:100%} }
+    .node-float-1 { animation: nodeFloat1 6s ease-in-out infinite; }
+    .node-float-2 { animation: nodeFloat2 8s ease-in-out infinite; }
+    .node-float-3 { animation: nodeFloat3 7s ease-in-out infinite; }
+    .anim-float { animation: float 3s ease-in-out infinite; }
+    .scan-line { animation: scanLine 3s linear infinite; }
   </style>
 </head>
-<body class="bg-stone-50">
-<div id="root"></div>
-<script type="text/babel">
-const { useState, useEffect, useRef } = React;
 
-const NAV = ["About","Skills","Experience","Projects","Contact"];
+<body class="bg-stone-200">
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
 
-const STATS = [
-  { num:"5.8+", label:"Years Experience" },
-  { num:"v8–v19", label:"Odoo Versions" },
-  { num:"3+", label:"Team Size Led" },
-];
+    const NAV = ["About", "Skills", "Experience", "Projects", "Contact"];
 
-const HIGHLIGHTS = [
-  { icon:"✦", title:"Agentic AI & MCP", desc:"Intelligent agents with MCP servers, Telegram bots & GenAI for ERP automation" },
-  { icon:"◈", title:"Cloud & DevOps", desc:"Docker, Kubernetes, Nginx and CI/CD for scalable multi-tenant deployments" },
-  { icon:"⟡", title:"Deep Integrations", desc:"Payment gateways, SMS, Magento, external CRMs and networking modules" },
-  { icon:"△", title:"Team Leadership", desc:"Leading and mentoring developers, client management and Agile delivery" },
-];
+    const STATS = [
+      { num: "5.5+", label: "Years Experience" },
+      { num: "v8–v19", label: "Odoo Versions" },
+      { num: "10+", label: "Team Size Led" },
+    ];
 
-const SKILLS = [
-  { icon:"⚡", label:"Languages", tags:["Python","JavaScript","SQL","Bash/Shell"], featured:["Python"] },
-  { icon:"◻", label:"Frameworks", tags:["Odoo v8–v19","Django","Flask","FastAPI"], featured:["Odoo v8–v19"] },
-  { icon:"◉", label:"Databases", tags:["PostgreSQL","MySQL"], featured:["PostgreSQL"] },
-  { icon:"☁", label:"DevOps & Cloud", tags:["Docker","Kubernetes","Nginx","Terraform","Tekton"], featured:["Docker","Kubernetes"] },
-  { icon:"✦", label:"AI & Emerging", tags:["Agentic AI","MCP Servers","Generative AI","LLM Integration"], featured:["Agentic AI","MCP Servers"] },
-  { icon:"⟳", label:"Integrations", tags:["Payment Gateways","SMS Systems","Magento","Git/GitHub","PostgreSQL Opt."], featured:[] },
-];
+    const HIGHLIGHTS = [
+      { icon: "✦", title: "Agentic AI & MCP", desc: "Intelligent agents with MCP servers, Telegram bots & GenAI for ERP automation" },
+      { icon: "◈", title: "Cloud & DevOps", desc: "Docker, Kubernetes, Nginx and CI/CD for scalable multi-tenant deployments" },
+      { icon: "⟡", title: "Deep Integrations", desc: "Payment gateways, SMS, Magento, external CRMs and networking modules" },
+      { icon: "△", title: "Team Leadership", desc: "Leading and mentoring developers, client management and Agile delivery" },
+    ];
 
-const EXPERIENCES = [
-  { date:"Nov 2025 – Present", company:"Brainvire Infotech Pvt. Ltd.", role:"Senior Software Engineer", ai:true,
-    points:["Integrated Odoo with MCP servers & Telegram bot — admins fetch live project, task and financial data without opening Odoo","Built an intelligent agent to automate monitoring and reporting, reducing manual effort significantly","Developing case management solutions via Helpdesk tickets and customer feedback surveys","Integrated external CRM into Odoo using mini iframe architecture","Connected Magento website with Odoo for customer complaint registration workflows"] },
-  { date:"Dec 2024 – Sept 2025", company:"Ksolves India Limited", role:"Senior Software Engineer", ai:false,
-    points:["Managed and developed a SaaS tool focused on faster deployments and scalability","Led and mentored a development team ensuring smooth project execution","Integrated networking concepts including IPv4 and IPv6 within Odoo environments","Resolved complex technical challenges ensuring timely project delivery"] },
-  { date:"Oct 2023 – Dec 2024", company:"Surekha Technology", role:"Senior Software Developer · Ahmedabad", ai:false,
-    points:["Managed a team of developers, providing guidance and support for project success","Oversaw end-to-end client management from requirement gathering to final delivery","Learned and integrated Docker and Nginx into project workflows","Improved delivery timelines by optimising team workflows and resource allocation"] },
-  { date:"Aug 2020 – Sept 2023", company:"Serpent Consulting Services Pvt. Ltd.", role:"Software Developer · Gandhinagar", ai:false,
-    points:["Developed custom Odoo modules and system integrations across v8–v17","Managed end-to-end project delivery ensuring client satisfaction","Collaborated with cross-functional teams to meet project deadlines","Implemented best practices improving system performance and reliability"] },
-];
+    const SKILLS = [
+      { icon: "⚡", label: "Languages", tags: ["Python", "JavaScript", "SQL", "Bash/Shell"], featured: ["Python"] },
+      { icon: "◻", label: "Frameworks", tags: ["Odoo v8–v19", "Django", "Flask", "FastAPI"], featured: ["Odoo v8–v19"] },
+      { icon: "◉", label: "Databases", tags: ["PostgreSQL", "MySQL"], featured: ["PostgreSQL"] },
+      { icon: "☁", label: "DevOps & Cloud", tags: ["Docker", "Kubernetes", "Nginx", "Terraform", "Tekton"], featured: ["Docker", "Kubernetes"] },
+      { icon: "✦", label: "AI & Emerging", tags: ["Agentic AI", "MCP Servers", "Generative AI", "LLM Integration"], featured: ["Agentic AI", "MCP Servers"] },
+      { icon: "⟳", label: "Integrations", tags: ["Payment Gateways", "SMS Systems", "Magento", "Git/GitHub", "PostgreSQL Opt."], featured: [] },
+    ];
 
-const PROJECTS = [
-  { tags:[{l:"AI",c:"bg-emerald-50 text-emerald-700"},{l:"MCP",c:"bg-teal-50 text-teal-700"}], title:"Odoo AI Assistant",
-    desc:"Intelligent agent integrating Odoo with MCP servers and Telegram bot for real-time data access. Admins fetch project status, tasks and financial data without logging in. Automated monitoring reduces manual effort across the board.",
-    tech:["Python","MCP Servers","Telegram Bot","Odoo","Agentic AI"] },
-  { tags:[{l:"Cloud",c:"bg-blue-50 text-blue-700"},{l:"SaaS",c:"bg-indigo-50 text-indigo-700"}], title:"SaaS & Cloud Deployments",
-    desc:"Designed a SaaS tool optimising deployments and scalability for multi-tenant Odoo environments. Automated CI/CD pipelines cut deployment time significantly. Improved stability via Docker, Kubernetes and Nginx.",
-    tech:["Docker","Kubernetes","Nginx","CI/CD","Multi-tenant"] },
-  { tags:[{l:"Integration",c:"bg-amber-50 text-amber-700"}], title:"Networking Integration in Odoo",
-    desc:"Integrated IPv4, IPv6, dual/single stack support, IP distribution and subnet calculations within Odoo. Delivered modules improving ERP infrastructure readiness with hybrid IP stack compatibility.",
-    tech:["Python","Odoo","IPv4/IPv6","Networking"] },
-  { tags:[{l:"ERP",c:"bg-violet-50 text-violet-700"},{l:"DevOps",c:"bg-blue-50 text-blue-700"}], title:"Client Management Systems",
-    desc:"Streamlined client interactions and project tracking. Improved communication efficiency by 30% and reduced deployment time by 40% through optimised workflows.",
-    tech:["Python","Odoo","Docker","Nginx"] },
-  { tags:[{l:"Migration",c:"bg-rose-50 text-rose-700"}], title:"ERP Migrations & Upgrades",
-    desc:"Migrated modules across Odoo v9–v17, resolving complex technical challenges and improving system performance. Ensured seamless continuity for enterprise clients.",
-    tech:["Odoo v9–v17","Python","PostgreSQL"] },
-  { tags:[{l:"Integration",c:"bg-amber-50 text-amber-700"}], title:"Technical Integrations",
-    desc:"Integrated payment gateways, SMS systems, Magento and external CRM systems with Odoo. Delivered seamless data flow between enterprise systems via robust API architecture.",
-    tech:["Payment APIs","SMS Gateway","Magento","REST APIs"] },
-];
+    const EXPERIENCES = [
+      {
+        date: "Nov 2025 – Present", company: "Brainvire Infotech Pvt. Ltd.", role: "Senior Software Engineer", ai: true,
+        points: ["Integrated Odoo with MCP servers & Telegram bot — admins fetch live project, task and financial data without opening Odoo", "Built an intelligent agent to automate monitoring and reporting, reducing manual effort significantly", "Developing case management solutions via Helpdesk tickets and customer feedback surveys", "Integrated external CRM into Odoo using mini iframe architecture", "Connected Magento website with Odoo for customer complaint registration workflows"]
+      },
+      {
+        date: "Dec 2024 – Sept 2025", company: "Ksolves India Limited", role: "Senior Software Engineer", ai: false,
+        points: ["Managed and developed a SaaS tool focused on faster deployments and scalability", "Led and mentored a development team ensuring smooth project execution", "Integrated networking concepts including IPv4 and IPv6 within Odoo environments", "Resolved complex technical challenges ensuring timely project delivery"]
+      },
+      {
+        date: "Oct 2023 – Dec 2024", company: "Surekha Technology", role: "Senior Software Developer · Ahmedabad", ai: false,
+        points: ["Managed a team of developers, providing guidance and support for project success", "Oversaw end-to-end client management from requirement gathering to final delivery", "Learned and integrated Docker and Nginx into project workflows", "Improved delivery timelines by optimising team workflows and resource allocation"]
+      },
+      {
+        date: "Aug 2020 – Sept 2023", company: "Serpent Consulting Services Pvt. Ltd.", role: "Software Developer · Gandhinagar", ai: false,
+        points: ["Developed custom Odoo modules and system integrations across v8–v17", "Managed end-to-end project delivery ensuring client satisfaction", "Collaborated with cross-functional teams to meet project deadlines", "Implemented best practices improving system performance and reliability"]
+      },
+    ];
 
-function useInView() {
-  const ref = useRef(null);
-  const [v, setV] = useState(false);
-  useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if(e.isIntersecting){setV(true);obs.disconnect();} },{threshold:0.1});
-    if(ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  },[]);
-  return [ref, v];
-}
+    const PROJECTS = [
+      {
+        tags: [{ l: "AI", c: "bg-emerald-50 text-emerald-700" }, { l: "MCP", c: "bg-teal-50 text-teal-700" }], title: "Odoo AI Assistant",
+        desc: "Intelligent agent integrating Odoo with MCP servers and Telegram bot for real-time data access. Admins fetch project status, tasks and financial data without logging in. Automated monitoring reduces manual effort across the board.",
+        tech: ["Python", "MCP Servers", "Telegram Bot", "Odoo", "Agentic AI"]
+      },
+      {
+        tags: [{ l: "Cloud", c: "bg-blue-50 text-blue-700" }, { l: "SaaS", c: "bg-indigo-50 text-indigo-700" }], title: "SaaS & Cloud Deployments",
+        desc: "Designed a SaaS tool optimising deployments and scalability for multi-tenant Odoo environments. Automated CI/CD pipelines cut deployment time significantly. Improved stability via Docker, Kubernetes and Nginx.",
+        tech: ["Docker", "Kubernetes", "Nginx", "CI/CD", "Multi-tenant"]
+      },
+      {
+        tags: [{ l: "Integration", c: "bg-amber-50 text-amber-700" }], title: "Networking Integration in Odoo",
+        desc: "Integrated IPv4, IPv6, dual/single stack support, IP distribution and subnet calculations within Odoo. Delivered modules improving ERP infrastructure readiness with hybrid IP stack compatibility.",
+        tech: ["Python", "Odoo", "IPv4/IPv6", "Networking"]
+      },
+      {
+        tags: [{ l: "ERP", c: "bg-violet-50 text-violet-700" }, { l: "DevOps", c: "bg-blue-50 text-blue-700" }], title: "Client Management Systems",
+        desc: "Streamlined client interactions and project tracking. Improved communication efficiency by 30% and reduced deployment time by 40% through optimised workflows.",
+        tech: ["Python", "Odoo", "Docker", "Nginx"]
+      },
+      {
+        tags: [{ l: "Migration", c: "bg-rose-50 text-rose-700" }], title: "ERP Migrations & Upgrades",
+        desc: "Migrated modules across Odoo v9–v17, resolving complex technical challenges and improving system performance. Ensured seamless continuity for enterprise clients.",
+        tech: ["Odoo v9–v17", "Python", "PostgreSQL"]
+      },
+      {
+        tags: [{ l: "Integration", c: "bg-amber-50 text-amber-700" }], title: "Technical Integrations",
+        desc: "Integrated payment gateways, SMS systems, Magento and external CRM systems with Odoo. Delivered seamless data flow between enterprise systems via robust API architecture.",
+        tech: ["Payment APIs", "SMS Gateway", "Magento", "REST APIs"]
+      },
+    ];
 
-function FadeUp({children, delay=0, className=""}) {
-  const [ref,v] = useInView();
-  return (
-    <div ref={ref} className={className} style={{opacity:v?1:0,transform:v?"translateY(0)":"translateY(26px)",transition:`opacity .5s ${delay}s ease, transform .5s ${delay}s ease`}}>
-      {children}
-    </div>
-  );
-}
+    function useInView() {
+      const ref = useRef(null);
+      const [v, setV] = useState(false);
+      useEffect(() => {
+        const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setV(true); obs.disconnect(); } }, { threshold: 0.1 });
+        if (ref.current) obs.observe(ref.current);
+        return () => obs.disconnect();
+      }, []);
+      return [ref, v];
+    }
 
-function SLabel({c}) { return <p className="text-xs font-semibold tracking-[0.14em] uppercase text-stone-400 mb-2">{c}</p>; }
-function STitle({c}) { return <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 tracking-tight mb-10 leading-tight" style={{fontFamily:"Outfit,sans-serif"}}>{c}</h2>; }
-
-function App() {
-  const [active,setActive] = useState("");
-  const [scrolled,setScrolled] = useState(false);
-  const [menu,setMenu] = useState(false);
-
-  useEffect(() => {
-    const fn = () => {
-      setScrolled(window.scrollY > 40);
-      let cur="";
-      NAV.forEach(n => { const s=document.getElementById(n.toLowerCase()); if(s&&window.scrollY>=s.offsetTop-140) cur=n.toLowerCase(); });
-      setActive(cur);
-    };
-    window.addEventListener("scroll",fn);
-    return ()=>window.removeEventListener("scroll",fn);
-  },[]);
-
-  const go = id => { document.getElementById(id)?.scrollIntoView({behavior:"smooth"}); setMenu(false); };
-
-  return (
-    <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');`}</style>
-
-      {/* FULL-PAGE GRID BACKGROUND */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <svg className="w-full h-full opacity-[0.035]" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid-global" width="48" height="48" patternUnits="userSpaceOnUse">
-              <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#6d28d9" strokeWidth="0.6"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid-global)"/>
-        </svg>
-      </div>
-
-
-      {/* NAV */}
-      <nav style={{fontFamily:"Outfit,sans-serif"}} className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled?"bg-white/90 backdrop-blur-md shadow-sm border-b border-stone-100":"bg-transparent"}`}>
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <span className="text-lg font-bold text-stone-900" style={{fontFamily:"Outfit,sans-serif"}}>S<span className="text-violet-600">.</span>Soni</span>
-          <ul className="hidden md:flex gap-8">
-            {NAV.map(n => (
-              <li key={n}>
-                <button onClick={()=>go(n.toLowerCase())} className={`text-sm font-medium transition-colors ${active===n.toLowerCase()?"text-violet-600":"text-stone-500 hover:text-stone-900"}`}>{n}</button>
-              </li>
-            ))}
-          </ul>
-          <button className="md:hidden p-1 flex flex-col gap-1" onClick={()=>setMenu(o=>!o)}>
-            <div className={`w-5 h-0.5 bg-stone-700 transition-all ${menu?"rotate-45 translate-y-1.5":""}`}/>
-            <div className={`w-5 h-0.5 bg-stone-700 transition-all ${menu?"opacity-0":""}`}/>
-            <div className={`w-5 h-0.5 bg-stone-700 transition-all ${menu?"-rotate-45 -translate-y-1.5":""}`}/>
-          </button>
+    function FadeUp({ children, delay = 0, className = "" }) {
+      const [ref, v] = useInView();
+      return (
+        <div ref={ref} className={className} style={{ opacity: v ? 1 : 0, transform: v ? "translateY(0)" : "translateY(26px)", transition: `opacity .5s ${delay}s ease, transform .5s ${delay}s ease` }}>
+          {children}
         </div>
-        {menu && (
-          <div className="md:hidden bg-white border-t border-stone-100 px-6 py-4 flex flex-col gap-4">
-            {NAV.map(n=><button key={n} onClick={()=>go(n.toLowerCase())} className="text-sm font-medium text-stone-700 text-left">{n}</button>)}
-          </div>
-        )}
-      </nav>
+      );
+    }
 
-      {/* HERO */}
-      <section id="hero" className="relative min-h-screen flex items-center overflow-hidden pt-20">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-violet-100/60 blur-3xl -translate-y-1/4 translate-x-1/4"/>
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-teal-100/50 blur-3xl translate-y-1/4 -translate-x-1/4"/>
-          <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
-            <defs><pattern id="g" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M 48 0 L 0 0 0 48" fill="none" stroke="#6d28d9" strokeWidth="0.7"/></pattern></defs>
-            <rect width="100%" height="100%" fill="url(#g)"/>
-          </svg>
-        </div>
-        <div className="relative max-w-6xl mx-auto px-6 w-full py-20">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-teal-700 bg-teal-50 border border-teal-200 px-4 py-2 rounded-full mb-8" style={{animation:"fadeUp .5s ease both"}}>
-              <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"/>Open to Opportunities
-            </div>
-            <h1 className="font-bold leading-[1.04] tracking-[-0.03em] text-stone-900 mb-6" style={{fontSize:"clamp(3rem,6vw,5rem)",fontFamily:"Outfit,sans-serif",animation:"fadeUp .55s .08s ease both"}}>
-              Shivam<br/><span className="text-violet-600">Soni</span><span className="text-teal-500">.</span>
-            </h1>
-            <p className="text-lg text-stone-500 font-light leading-relaxed mb-10 max-w-lg" style={{animation:"fadeUp .55s .16s ease both"}}>
-              Senior Software Developer specialising in <span className="font-medium text-stone-700">Odoo & Python</span> with 5.8+ years of end-to-end delivery. Currently building <span className="font-medium text-stone-700">Agentic AI & MCP-driven</span> ERP solutions.
-            </p>
-            <div className="flex gap-3 flex-wrap" style={{animation:"fadeUp .55s .24s ease both"}}>
-              <button onClick={()=>go("projects")} className="px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-lg transition-all hover:-translate-y-0.5 active:scale-95">View Projects ↓</button>
-              <button onClick={()=>go("contact")} className="px-6 py-3 border border-stone-300 hover:border-violet-400 hover:bg-violet-50 text-stone-700 text-sm font-semibold rounded-lg transition-all hover:-translate-y-0.5">Get In Touch</button>
-            </div>
-          </div>
-          <div className="flex gap-10 mt-16 flex-wrap" style={{animation:"fadeUp .55s .32s ease both"}}>
-            {STATS.map(s=>(
-              <div key={s.label}>
-                <div className="text-3xl font-bold text-stone-900" style={{fontFamily:"Outfit,sans-serif"}}>{s.num}</div>
-                <div className="text-xs text-stone-400 mt-0.5 tracking-wide">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+    function SLabel({ c }) { return <p className="text-xs font-semibold tracking-[0.14em] uppercase text-stone-400 mb-2">{c}</p>; }
+    function STitle({ c }) { return <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 tracking-tight mb-10 leading-tight" style={{ fontFamily: "Outfit,sans-serif" }}>{c}</h2>; }
 
-      {/* ABOUT */}
-      <section id="about" className="py-24 bg-white border-y border-stone-100">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
-          <FadeUp>
-            <SLabel c="About Me"/>
-            <STitle c={<>Building the <span className="text-violet-600">future</span> of ERP</>}/>
-            <div className="space-y-4 text-stone-500 font-light leading-relaxed">
-              <p>I'm an independent, self-motivated <span className="font-medium text-stone-700">Python/Odoo developer</span> based in Ahmedabad. With 5.8+ years of project delivery, I've worked across Odoo versions v8–v18 both functionally and technically.</p>
-              <p>Passionate about <span className="font-medium text-stone-700">efficient, innovative solutions</span> — from SaaS deployments and networking integrations to custom ERP modules and client management systems.</p>
-              <p>Currently exploring <span className="font-medium text-stone-700">Agentic AI, MCP servers, and Generative AI</span> to build intelligent automation-driven ERP solutions that reduce manual effort and improve decision-making.</p>
-            </div>
-          </FadeUp>
-          <FadeUp delay={0.1}>
-            <div className="grid grid-cols-2 gap-3">
-              {HIGHLIGHTS.map((h,i)=>(
-                <div key={i} className="bg-stone-50 border border-stone-100 rounded-xl p-5 hover:border-violet-200 hover:bg-violet-50/40 transition-all group">
-                  <span className="text-violet-500 text-base mb-3 block group-hover:scale-110 transition-transform">{h.icon}</span>
-                  <h4 className="font-semibold text-stone-800 text-sm mb-1" style={{fontFamily:"Outfit,sans-serif"}}>{h.title}</h4>
-                  <p className="text-xs text-stone-500 leading-relaxed">{h.desc}</p>
+    /* ── AI Neural Network Animation ── */
+    function NeuralNetwork() {
+      const canvasRef = useRef(null);
+      useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let animId;
+        const dpr = window.devicePixelRatio || 1;
+        const resize = () => {
+          const rect = canvas.parentElement.getBoundingClientRect();
+          canvas.width = rect.width * dpr;
+          canvas.height = rect.height * dpr;
+          canvas.style.width = rect.width + 'px';
+          canvas.style.height = rect.height + 'px';
+          ctx.scale(dpr, dpr);
+        };
+        resize();
+        window.addEventListener('resize', resize);
+
+        const W = () => canvas.width / dpr;
+        const H = () => canvas.height / dpr;
+
+        // Neural network nodes in 4 layers
+        const layers = [3, 5, 5, 3];
+        const getNodes = () => {
+          const nodes = [];
+          const w = W(), h = H();
+          const layerGap = w / (layers.length + 1);
+          layers.forEach((count, li) => {
+            const x = layerGap * (li + 1);
+            const gap = h / (count + 1);
+            for (let i = 0; i < count; i++) {
+              nodes.push({ x, y: gap * (i + 1), layer: li, r: li === 0 || li === layers.length - 1 ? 5 : 4 });
+            }
+          });
+          return nodes;
+        };
+
+        // Particles flowing along connections
+        const particles = [];
+        const spawnParticle = (nodes) => {
+          if (particles.length > 15) return;
+          const srcLayer = Math.floor(Math.random() * (layers.length - 1));
+          const srcNodes = nodes.filter(n => n.layer === srcLayer);
+          const dstNodes = nodes.filter(n => n.layer === srcLayer + 1);
+          if (!srcNodes.length || !dstNodes.length) return;
+          const src = srcNodes[Math.floor(Math.random() * srcNodes.length)];
+          const dst = dstNodes[Math.floor(Math.random() * dstNodes.length)];
+          particles.push({ sx: src.x, sy: src.y, dx: dst.x, dy: dst.y, t: 0, speed: 0.008 + Math.random() * 0.012 });
+        };
+
+        let t = 0;
+        const draw = () => {
+          t++;
+          const w = W(), h = H();
+          ctx.clearRect(0, 0, w, h);
+          const nodes = getNodes();
+
+          // Draw connections
+          for (let li = 0; li < layers.length - 1; li++) {
+            const src = nodes.filter(n => n.layer === li);
+            const dst = nodes.filter(n => n.layer === li + 1);
+            src.forEach(s => {
+              dst.forEach(d => {
+                const grad = ctx.createLinearGradient(s.x, s.y, d.x, d.y);
+                grad.addColorStop(0, 'rgba(139,92,246,0.08)');
+                grad.addColorStop(1, 'rgba(20,184,166,0.08)');
+                ctx.beginPath();
+                ctx.moveTo(s.x, s.y);
+                ctx.lineTo(d.x, d.y);
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 0.8;
+                ctx.stroke();
+              });
+            });
+          }
+
+          // Draw nodes
+          nodes.forEach((n, i) => {
+            const pulse = Math.sin(t * 0.03 + i * 0.5) * 0.3 + 0.7;
+            const isInput = n.layer === 0;
+            const isOutput = n.layer === layers.length - 1;
+            // Glow
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.r * 3, 0, Math.PI * 2);
+            const glowColor = isInput ? `rgba(20,184,166,${0.1 * pulse})` : isOutput ? `rgba(139,92,246,${0.15 * pulse})` : `rgba(139,92,246,${0.08 * pulse})`;
+            ctx.fillStyle = glowColor;
+            ctx.fill();
+            // Node
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+            const nodeColor = isInput ? `rgba(20,184,166,${0.6 + 0.3 * pulse})` : isOutput ? `rgba(139,92,246,${0.7 + 0.3 * pulse})` : `rgba(139,92,246,${0.4 + 0.2 * pulse})`;
+            ctx.fillStyle = nodeColor;
+            ctx.fill();
+          });
+
+          // Spawn & draw particles
+          if (t % 8 === 0) spawnParticle(nodes);
+          for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.t += p.speed;
+            if (p.t >= 1) { particles.splice(i, 1); continue; }
+            const x = p.sx + (p.dx - p.sx) * p.t;
+            const y = p.sy + (p.dy - p.sy) * p.t;
+            const alpha = Math.sin(p.t * Math.PI);
+            ctx.beginPath();
+            ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(139,92,246,${0.8 * alpha})`;
+            ctx.fill();
+            // Trail
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(20,184,166,${0.2 * alpha})`;
+            ctx.fill();
+          }
+
+          animId = requestAnimationFrame(draw);
+        };
+        draw();
+        return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', resize); };
+      }, []);
+
+      return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ opacity: 0.7 }} />;
+    }
+
+    /* ── Code Terminal Typing Animation ── */
+    function CodeTerminal() {
+      const [lines, setLines] = useState([]);
+      const codeLines = [
+        { text: 'from odoo_mcp import AgentServer', color: '#c4b5fd' },
+        { text: '', color: '' },
+        { text: 'class OdooAgent(BaseAgent):', color: '#7c3aed' },
+        { text: '    """Agentic AI for ERP"""', color: '#6ee7b7' },
+        { text: '', color: '' },
+        { text: '    def plan(self, query):', color: '#7c3aed' },
+        { text: '        tasks = self.llm.decompose(query)', color: '#d4d4d8' },
+        { text: '        return self.optimize(tasks)', color: '#d4d4d8' },
+        { text: '', color: '' },
+        { text: '    async def execute(self, plan):', color: '#7c3aed' },
+        { text: '        for step in plan.steps:', color: '#d4d4d8' },
+        { text: '            result = await self.mcp.call(', color: '#d4d4d8' },
+        { text: '                tool=step.tool,', color: '#fbbf24' },
+        { text: '                params=step.params', color: '#fbbf24' },
+        { text: '            )', color: '#d4d4d8' },
+        { text: '            yield AgentResponse(result)', color: '#2dd4bf' },
+      ];
+
+      useEffect(() => {
+        let i = 0;
+        const interval = setInterval(() => {
+          if (i < codeLines.length) {
+            const idx = i;
+            i++;
+            setLines(prev => [...prev, codeLines[idx]]);
+          } else {
+            i = 0;
+            setLines([]);
+          }
+        }, 400);
+        return () => clearInterval(interval);
+      }, []);
+
+      return (
+        <div className="bg-stone-900 rounded-xl overflow-hidden shadow-2xl border border-stone-700/50" style={{ fontFamily: "'Courier New', monospace" }}>
+          {/* Terminal header */}
+          <div className="flex items-center gap-2 px-4 py-3 bg-stone-800/80 border-b border-stone-700/50">
+            <div className="w-3 h-3 rounded-full bg-red-400/80" />
+            <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
+            <div className="w-3 h-3 rounded-full bg-green-400/80" />
+            <span className="text-xs text-stone-500 ml-2">agent.py — Agentic AI</span>
+          </div>
+          {/* Code area */}
+          <div className="p-4 min-h-[320px] relative overflow-hidden">
+            {/* Scan line */}
+            <div className="absolute left-0 right-0 h-px bg-violet-500/20 scan-line pointer-events-none" />
+            <div className="space-y-0.5">
+              {lines.map((line, idx) => (
+                <div key={idx} className="flex items-center gap-3 text-[13px] leading-relaxed" style={{ animation: 'fadeUp 0.3s ease both' }}>
+                  <span className="text-stone-600 text-[11px] w-5 text-right select-none">{idx + 1}</span>
+                  <span style={{ color: line.color || '#d4d4d8' }}>{line.text || '\u00A0'}</span>
+                  {idx === lines.length - 1 && <span className="inline-block w-2 h-4 bg-violet-400" style={{ animation: 'blink 1s step-end infinite' }} />}
                 </div>
               ))}
             </div>
-          </FadeUp>
+            {/* Decorative labels */}
+            {lines.length > 3 && (
+              <div className="absolute top-4 right-4 flex flex-col gap-2" style={{ animation: 'fadeUp 0.5s ease both' }}>
+                <span className="text-[10px] bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded-full">● MCP Server</span>
+                <span className="text-[10px] bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-full">● Agent Active</span>
+              </div>
+            )}
+          </div>
         </div>
-      </section>
+      );
+    }
 
-      {/* SKILLS */}
-      <section id="skills" className="py-24 bg-stone-50">
-        <div className="max-w-6xl mx-auto px-6">
-          <FadeUp><SLabel c="Technical Skills"/><STitle c={<>My <span className="text-violet-600">Toolkit</span></>}/></FadeUp>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {SKILLS.map((g,i)=>(
-              <FadeUp key={g.label} delay={i*.06}>
-                <div className="bg-white border border-stone-100 rounded-xl p-5 hover:border-violet-200 hover:shadow-sm transition-all h-full">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center text-violet-500 text-sm">{g.icon}</div>
-                    <span className="text-xs font-semibold uppercase tracking-widest text-stone-400">{g.label}</span>
+    /* ── Floating AI Badges ── */
+    function FloatingBadges() {
+      const badges = [
+        { text: '🐍 Python', x: '8%', y: '20%', delay: '0s', dur: '6s' },
+        { text: '🤖 AI Agent', x: '75%', y: '15%', delay: '1s', dur: '7s' },
+        { text: '⚡ MCP', x: '85%', y: '60%', delay: '2s', dur: '5s' },
+        { text: '🔗 LLM', x: '15%', y: '70%', delay: '0.5s', dur: '8s' },
+        { text: '🧠 GenAI', x: '60%', y: '80%', delay: '1.5s', dur: '6.5s' },
+      ];
+      return (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden hidden md:block">
+          {badges.map((b, i) => (
+            <div key={i} className="absolute text-[11px] font-medium text-stone-400/50 bg-white/5 backdrop-blur-sm border border-stone-200/20 px-3 py-1.5 rounded-full anim-float"
+              style={{ left: b.x, top: b.y, animationDelay: b.delay, animationDuration: b.dur }}>
+              {b.text}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function App() {
+      const [active, setActive] = useState("");
+      const [scrolled, setScrolled] = useState(false);
+      const [menu, setMenu] = useState(false);
+
+      useEffect(() => {
+        const fn = () => {
+          setScrolled(window.scrollY > 40);
+          let cur = "";
+          NAV.forEach(n => { const s = document.getElementById(n.toLowerCase()); if (s && window.scrollY >= s.offsetTop - 140) cur = n.toLowerCase(); });
+          setActive(cur);
+        };
+        window.addEventListener("scroll", fn);
+        return () => window.removeEventListener("scroll", fn);
+      }, []);
+
+      const go = id => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setMenu(false); };
+
+      return (
+        <>
+          <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');`}</style>
+
+          {/* FULL-PAGE GRID BACKGROUND */}
+          <div className="fixed inset-0 pointer-events-none z-0">
+            <svg className="w-full h-full opacity-[0.035]" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="grid-global" width="48" height="48" patternUnits="userSpaceOnUse">
+                  <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#6d28d9" strokeWidth="0.6" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grid-global)" />
+            </svg>
+          </div>
+
+
+          {/* NAV */}
+          <nav style={{ fontFamily: "Outfit,sans-serif" }} className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-md border-b border-stone-200" : "bg-transparent"}`}>
+            <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+              <span className="text-lg font-bold text-stone-900" style={{ fontFamily: "Outfit,sans-serif" }}>Shivam<span className="text-violet-600"> </span>Soni</span>
+              <ul className="hidden md:flex gap-8">
+                {NAV.map(n => (
+                  <li key={n}>
+                    <button onClick={() => go(n.toLowerCase())} className={`text-sm font-medium transition-colors ${active === n.toLowerCase() ? "text-violet-600" : "text-stone-500 hover:text-stone-900"}`}>{n}</button>
+                  </li>
+                ))}
+              </ul>
+              <button className="md:hidden p-1 flex flex-col gap-1" onClick={() => setMenu(o => !o)}>
+                <div className={`w-5 h-0.5 bg-stone-700 transition-all ${menu ? "rotate-45 translate-y-1.5" : ""}`} />
+                <div className={`w-5 h-0.5 bg-stone-700 transition-all ${menu ? "opacity-0" : ""}`} />
+                <div className={`w-5 h-0.5 bg-stone-700 transition-all ${menu ? "-rotate-45 -translate-y-1.5" : ""}`} />
+              </button>
+            </div>
+            {menu && (
+              <div className="md:hidden bg-white border-t border-stone-200 px-6 py-4 flex flex-col gap-4">
+                {NAV.map(n => <button key={n} onClick={() => go(n.toLowerCase())} className="text-sm font-medium text-stone-700 text-left">{n}</button>)}
+              </div>
+            )}
+          </nav>
+
+          {/* HERO */}
+          <section id="hero" className="relative min-h-screen flex items-center overflow-hidden pt-20">
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-violet-100/60 blur-3xl -translate-y-1/4 translate-x-1/4" />
+              <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-teal-100/50 blur-3xl translate-y-1/4 -translate-x-1/4" />
+              <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+                <defs><pattern id="g" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M 48 0 L 0 0 0 48" fill="none" stroke="#6d28d9" strokeWidth="0.7" /></pattern></defs>
+                <rect width="100%" height="100%" fill="url(#g)" />
+              </svg>
+            </div>
+            <FloatingBadges />
+            <div className="relative max-w-6xl mx-auto px-6 w-full py-20">
+              <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                  <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-teal-700 bg-teal-50 border border-teal-200 px-4 py-2 rounded-full mb-8" style={{ animation: "fadeUp .5s ease both" }}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />Open to Opportunities
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {g.tags.map(t=>(
-                      <span key={t} className={`text-xs font-medium px-2.5 py-1 rounded-full border transition-colors ${g.featured.includes(t)?"bg-violet-50 text-violet-700 border-violet-200":"bg-stone-50 text-stone-600 border-stone-200 hover:border-stone-300"}`}>{t}</span>
+                  <h1 className="font-bold leading-[1.04] tracking-[-0.03em] text-stone-900 mb-6" style={{ fontSize: "clamp(3rem,6vw,5rem)", fontFamily: "Outfit,sans-serif", animation: "fadeUp .55s .08s ease both" }}>
+                    Shivam<br /><span className="text-violet-600">Soni</span><span className="text-teal-500">.</span>
+                  </h1>
+                  <p className="text-lg text-stone-500 font-light leading-relaxed mb-10 max-w-lg" style={{ animation: "fadeUp .55s .16s ease both" }}>
+                    Senior Software Developer specialising in <span className="font-medium text-stone-700">Odoo & Python</span> with 5.8+ years of end-to-end delivery. Currently building <span className="font-medium text-stone-700">Agentic AI & MCP-driven</span> ERP solutions.
+                  </p>
+                  <div className="flex gap-3 flex-wrap" style={{ animation: "fadeUp .55s .24s ease both" }}>
+                    <button onClick={() => go("projects")} className="px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-lg transition-all hover:-translate-y-0.5 active:scale-95">View Projects ↓</button>
+                    <button onClick={() => go("contact")} className="px-6 py-3 border border-stone-300 hover:border-violet-400 hover:bg-violet-50 text-stone-700 text-sm font-semibold rounded-lg transition-all hover:-translate-y-0.5">Get In Touch</button>
+                  </div>
+                  <div className="flex gap-10 mt-12 flex-wrap" style={{ animation: "fadeUp .55s .32s ease both" }}>
+                    {STATS.map(s => (
+                      <div key={s.label}>
+                        <div className="text-3xl font-bold text-stone-900" style={{ fontFamily: "Outfit,sans-serif" }}>{s.num}</div>
+                        <div className="text-xs text-stone-400 mt-0.5 tracking-wide">{s.label}</div>
+                      </div>
                     ))}
                   </div>
                 </div>
-              </FadeUp>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* EXPERIENCE */}
-      <section id="experience" className="py-24 bg-white border-y border-stone-100">
-        <div className="max-w-3xl mx-auto px-6">
-          <FadeUp><SLabel c="Work History"/><STitle c={<><span className="text-violet-600">Experience</span> Timeline</>}/></FadeUp>
-          <div className="relative pl-4">
-            <div className="absolute left-0 top-2 bottom-2 w-px bg-gradient-to-b from-violet-400 via-violet-200 to-transparent"/>
-            <div className="flex flex-col gap-10">
-              {EXPERIENCES.map((e,i)=>(
-                <FadeUp key={i} delay={i*.08}>
-                  <div className="relative pl-6">
-                    <div className="absolute -left-[0.35rem] top-1.5 w-2.5 h-2.5 rounded-full bg-violet-500 border-2 border-white ring-2 ring-violet-200"/>
-                    <div className="text-xs font-semibold text-teal-600 tracking-wide mb-1">{e.date}</div>
-                    <div className="text-lg font-bold text-stone-900 leading-tight mb-0.5" style={{fontFamily:"Outfit,sans-serif"}}>{e.company}</div>
-                    <div className="text-sm text-violet-500 font-medium mb-3">{e.role}</div>
-                    {e.ai && <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 px-3 py-1 rounded-full mb-3">✦ AI Initiative</div>}
-                    <div className="bg-stone-50 border border-stone-100 rounded-xl p-4">
-                      <ul className="flex flex-col gap-2.5">
-                        {e.points.map((p,j)=>(
-                          <li key={j} className="flex gap-3 text-sm text-stone-500 leading-relaxed">
-                            <span className="text-violet-400 mt-0.5 shrink-0">→</span><span>{p}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </FadeUp>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* PROJECTS */}
-      <section id="projects" className="py-24 bg-stone-50">
-        <div className="max-w-6xl mx-auto px-6">
-          <FadeUp><SLabel c="Featured Work"/><STitle c={<>Key <span className="text-violet-600">Projects</span></>}/></FadeUp>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {PROJECTS.map((p,i)=>(
-              <FadeUp key={i} delay={i*.06}>
-                <div className="bg-white border border-stone-100 rounded-xl p-6 flex flex-col h-full hover:border-violet-200 hover:shadow-md transition-all group relative overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-violet-400 to-teal-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"/>
-                  <div className="flex gap-2 flex-wrap mb-3">
-                    {p.tags.map(t=><span key={t.l} className={`text-[11px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded ${t.c}`}>{t.l}</span>)}
-                  </div>
-                  <h3 className="font-bold text-stone-900 text-base mb-2" style={{fontFamily:"Outfit,sans-serif"}}>{p.title}</h3>
-                  <p className="text-sm text-stone-500 leading-relaxed flex-1">{p.desc}</p>
-                  <div className="flex flex-wrap gap-1.5 mt-4 pt-4 border-t border-stone-100">
-                    {p.tech.map(t=><span key={t} className="text-[11px] bg-stone-50 text-stone-500 border border-stone-200 px-2 py-0.5 rounded">{t}</span>)}
+                {/* Neural Network Animation */}
+                <div className="hidden md:block relative h-[420px] rounded-2xl overflow-hidden bg-stone-100/50 border border-stone-200/60" style={{ animation: "fadeUp .6s .2s ease both" }}>
+                  <NeuralNetwork />
+                  <div className="absolute bottom-4 left-4 right-4 flex gap-2">
+                    <span className="text-[10px] font-semibold bg-violet-100 text-violet-600 px-3 py-1 rounded-full">Neural Network</span>
+                    <span className="text-[10px] font-semibold bg-teal-100 text-teal-600 px-3 py-1 rounded-full">Live Simulation</span>
                   </div>
                 </div>
-              </FadeUp>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CONTACT */}
-      <section id="contact" className="py-24 bg-white border-t border-stone-100 text-center">
-        <div className="max-w-xl mx-auto px-6">
-          <FadeUp>
-            <SLabel c="Get In Touch"/>
-            <STitle c={<>Let's <span className="text-violet-600">Connect</span></>}/>
-            <p className="text-stone-500 font-light leading-relaxed mb-8">Open to new opportunities, collaborations and projects — especially AI-driven ERP and automation. Feel free to reach out!</p>
-            <a href="mailto:shivamsoni16997@gmail.com" className="inline-flex items-center gap-2 px-7 py-3 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-lg transition-all hover:-translate-y-0.5 active:scale-95">
-              ✉ shivamsoni16997@gmail.com
-            </a>
-            <div className="flex justify-center gap-3 flex-wrap mt-8">
-              {[{icon:"📞",text:"+91 63548 52904",href:"tel:+916354852904"},{icon:"📍",text:"Ahmedabad, Gujarat",href:"#"},{icon:"🎓",text:"B.E. Computer Engg · 2019",href:"#"}].map(c=>(
-                <a key={c.text} href={c.href} className="inline-flex items-center gap-2 text-sm text-stone-500 border border-stone-200 px-4 py-2.5 rounded-lg hover:border-violet-300 hover:text-stone-700 hover:bg-violet-50 transition-all">
-                  <span>{c.icon}</span>{c.text}
-                </a>
-              ))}
+              </div>
             </div>
-          </FadeUp>
-        </div>
-      </section>
+          </section>
 
-      {/* FOOTER */}
-      <footer className="bg-stone-50 border-t border-stone-100 py-6 px-6">
-        <div className="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-3">
-          <p className="text-xs text-stone-400">© 2025 Shivam Soni. Built with passion for great engineering.</p>
-          <p className="text-xs text-stone-400">Senior Software Developer · <a href="mailto:shivamsoni16997@gmail.com" className="text-violet-500 hover:text-violet-700">shivamsoni16997@gmail.com</a></p>
-        </div>
-      </footer>
-    </>
-  );
-}
+          {/* ABOUT */}
+          <section id="about" className="py-24 bg-white border-y border-stone-200 shadow-sm">
+            <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+              <FadeUp>
+                <SLabel c="About Me" />
+                <STitle c={<>Building the <span className="text-violet-600">future</span> of ERP</>} />
+                <div className="space-y-4 text-stone-500 font-light leading-relaxed">
+                  <p>I'm an independent, self-motivated <span className="font-medium text-stone-700">Python/Odoo developer</span>. With 5.5+ years of project delivery, I've worked across Odoo versions v8–v18 both functionally and technically.</p>
+                  <p>Passionate about <span className="font-medium text-stone-700">efficient, innovative solutions</span> — from SaaS deployments and networking integrations to custom ERP modules and client management systems.</p>
+                  <p>Currently exploring <span className="font-medium text-stone-700">Agentic AI, MCP servers, and Generative AI</span> to build intelligent automation-driven ERP solutions that reduce manual effort and improve decision-making.</p>
+                </div>
+              </FadeUp>
+              <FadeUp delay={0.1}>
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  {HIGHLIGHTS.map((h, i) => (
+                    <div key={i} className="bg-white border border-stone-200 rounded-xl p-5 shadow-sm hover:border-violet-300 hover:shadow-md hover:bg-violet-50/40 transition-all group">
+                      <span className="text-violet-500 text-base mb-3 block group-hover:scale-110 transition-transform">{h.icon}</span>
+                      <h4 className="font-semibold text-stone-800 text-sm mb-1" style={{ fontFamily: "Outfit,sans-serif" }}>{h.title}</h4>
+                      <p className="text-xs text-stone-500 leading-relaxed">{h.desc}</p>
+                    </div>
+                  ))}
+                </div>
+                {/* Code Terminal Animation */}
+                <CodeTerminal />
+              </FadeUp>
+            </div>
+          </section>
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App/>);
-</script>
+          {/* SKILLS */}
+          <section id="skills" className="py-24 bg-stone-200/80">
+            <div className="max-w-6xl mx-auto px-6">
+              <FadeUp><SLabel c="Technical Skills" /><STitle c={<>My <span className="text-violet-600">Toolkit</span></>} /></FadeUp>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {SKILLS.map((g, i) => (
+                  <FadeUp key={g.label} delay={i * .06}>
+                    <div className="bg-white border border-stone-200 rounded-xl p-5 shadow-sm hover:border-violet-300 hover:shadow-md transition-all h-full">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center text-violet-500 text-sm">{g.icon}</div>
+                        <span className="text-xs font-semibold uppercase tracking-widest text-stone-400">{g.label}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {g.tags.map(t => (
+                          <span key={t} className={`text-xs font-medium px-2.5 py-1 rounded-full border transition-colors ${g.featured.includes(t) ? "bg-violet-50 text-violet-700 border-violet-200" : "bg-stone-50 text-stone-600 border-stone-200 hover:border-stone-300"}`}>{t}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </FadeUp>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* EXPERIENCE */}
+          <section id="experience" className="py-24 bg-white border-y border-stone-200 shadow-sm">
+            <div className="max-w-3xl mx-auto px-6">
+              <FadeUp><SLabel c="Work History" /><STitle c={<><span className="text-violet-600">Experience</span> Timeline</>} /></FadeUp>
+              <div className="relative pl-4">
+                <div className="absolute left-0 top-2 bottom-2 w-px bg-gradient-to-b from-violet-400 via-violet-200 to-transparent" />
+                <div className="flex flex-col gap-10">
+                  {EXPERIENCES.map((e, i) => (
+                    <FadeUp key={i} delay={i * .08}>
+                      <div className="relative pl-6">
+                        <div className="absolute -left-[0.35rem] top-1.5 w-2.5 h-2.5 rounded-full bg-violet-500 border-2 border-white ring-2 ring-violet-200" />
+                        <div className="text-xs font-semibold text-teal-600 tracking-wide mb-1">{e.date}</div>
+                        <div className="text-lg font-bold text-stone-900 leading-tight mb-0.5" style={{ fontFamily: "Outfit,sans-serif" }}>{e.company}</div>
+                        <div className="text-sm text-violet-500 font-medium mb-3">{e.role}</div>
+                        {e.ai && <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 px-3 py-1 rounded-full mb-3">✦ AI Initiative</div>}
+                        <div className="bg-stone-100 border border-stone-200 rounded-xl p-4 shadow-sm">
+                          <ul className="flex flex-col gap-2.5">
+                            {e.points.map((p, j) => (
+                              <li key={j} className="flex gap-3 text-sm text-stone-500 leading-relaxed">
+                                <span className="text-violet-400 mt-0.5 shrink-0">→</span><span>{p}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </FadeUp>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* PROJECTS */}
+          <section id="projects" className="py-24 bg-stone-200/80">
+            <div className="max-w-6xl mx-auto px-6">
+              <FadeUp><SLabel c="Featured Work" /><STitle c={<>Key <span className="text-violet-600">Projects</span></>} /></FadeUp>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {PROJECTS.map((p, i) => (
+                  <FadeUp key={i} delay={i * .06}>
+                    <div className="bg-white border border-stone-200 rounded-xl p-6 flex flex-col h-full shadow-sm hover:border-violet-300 hover:shadow-lg transition-all group relative overflow-hidden">
+                      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-violet-400 to-teal-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                      <div className="flex gap-2 flex-wrap mb-3">
+                        {p.tags.map(t => <span key={t.l} className={`text-[11px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded ${t.c}`}>{t.l}</span>)}
+                      </div>
+                      <h3 className="font-bold text-stone-900 text-base mb-2" style={{ fontFamily: "Outfit,sans-serif" }}>{p.title}</h3>
+                      <p className="text-sm text-stone-500 leading-relaxed flex-1">{p.desc}</p>
+                      <div className="flex flex-wrap gap-1.5 mt-4 pt-4 border-t border-stone-200">
+                        {p.tech.map(t => <span key={t} className="text-[11px] bg-stone-50 text-stone-500 border border-stone-200 px-2 py-0.5 rounded">{t}</span>)}
+                      </div>
+                    </div>
+                  </FadeUp>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* CONTACT */}
+          <section id="contact" className="py-24 bg-white border-t border-stone-200 shadow-sm text-center">
+            <div className="max-w-xl mx-auto px-6">
+              <FadeUp>
+                <SLabel c="Get In Touch" />
+                <STitle c={<>Let's <span className="text-violet-600">Connect</span></>} />
+                <p className="text-stone-500 font-light leading-relaxed mb-8">Open to new opportunities, collaborations and projects — especially AI-driven ERP and automation. Feel free to reach out!</p>
+                <a href="mailto:shivamsoni16997@gmail.com" className="inline-flex items-center gap-2 px-7 py-3 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-lg transition-all hover:-translate-y-0.5 active:scale-95">
+                  ✉ shivamsoni16997@gmail.com
+                </a>
+                <div className="flex justify-center gap-3 flex-wrap mt-8">
+                  {[{ icon: "📞", text: "+91 63548 52904", href: "tel:+916354852904" }, { icon: "🔗", text: "LinkedIn", href: "https://www.linkedin.com/in/shivamsoni7" }, { icon: "📍", text: "Ahmedabad, Gujarat", href: "#" }, { icon: "🎓", text: "B.E. Computer Engg · 2019", href: "#" }].map(c => (
+                    <a key={c.text} href={c.href} className="inline-flex items-center gap-2 text-sm text-stone-500 border border-stone-200 px-4 py-2.5 rounded-lg hover:border-violet-300 hover:text-stone-700 hover:bg-violet-50 transition-all">
+                      <span>{c.icon}</span>{c.text}
+                    </a>
+                  ))}
+                </div>
+              </FadeUp>
+            </div>
+          </section>
+
+          {/* FOOTER */}
+          <footer className="bg-stone-100 border-t border-stone-200 py-6 px-6">
+            <div className="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-3">
+              <p className="text-xs text-stone-400">© 2025 Shivam Soni. Built with passion for great engineering.</p>
+              <p className="text-xs text-stone-400">Senior Software Developer · <a href="mailto:shivamsoni16997@gmail.com" className="text-violet-500 hover:text-violet-700">shivamsoni16997@gmail.com</a></p>
+            </div>
+          </footer>
+        </>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
 </body>
+
 </html>
